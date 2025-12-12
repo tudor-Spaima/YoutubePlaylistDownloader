@@ -295,39 +295,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
                     downloadSpeeds.Clear();
 
                     var streamInfoSet = await client.Videos.Streams.GetManifestAsync(video.Id, token);
-                    IStreamInfo bestQuality;
-                    if (downloadSettings.VideoLanguage == "default")
-                    {
-                        var defaultLangaugeVideos = streamInfoSet.GetAudioOnlyStreams().Where(x => x.IsAudioLanguageDefault.HasValue && x.IsAudioLanguageDefault.Value);
-                        if (defaultLangaugeVideos.Any())
-                        {
-                            bestQuality = defaultLangaugeVideos.GetWithHighestBitrate();
-                        }
-                        else
-                        {
-                            bestQuality = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
-                        }
-                    }
-                    else
-                    {
-                        var videoesInRequestedLanguage = streamInfoSet.GetAudioOnlyStreams().Where(x => x.AudioLanguage.HasValue && x.AudioLanguage.Value.Code.Contains(downloadSettings.VideoLanguage));
-                        if (videoesInRequestedLanguage.Any())
-                        {
-                            bestQuality = videoesInRequestedLanguage.GetWithHighestBitrate();
-                        }
-                        else
-                        {
-                            var defaultAudioStreams = streamInfoSet.GetAudioOnlyStreams().Where(x => x.IsAudioLanguageDefault.HasValue && x.IsAudioLanguageDefault.Value);
-                            if (defaultAudioStreams.Any())
-                            {
-                                bestQuality =defaultAudioStreams.GetWithHighestBitrate();
-                            }
-                            else
-                            {
-                                bestQuality = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
-                            }
-                        }
-                    }
+                    var bestQuality = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
                     var cleanFileNameWithID = GlobalConsts.CleanFileName(video.Title + video.Id);
                     var cleanFileName = GlobalConsts.CleanFileName(downloadSettings.GetFilenameByPattern(video, i, title, Playlist));
                     var fileLoc = $"{GlobalConsts.TempFolderPath}{cleanFileNameWithID}";
@@ -655,38 +623,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
                     : videoList.ThenBy(x => Math.Abs(x.VideoQuality.MaxHeight - Quality.MaxHeight));
 
                 bestQuality = videoList.FirstOrDefault();
-                if (downloadSettings.VideoLanguage == "default")
-                {
-                    var defaultLangaugeVideos = streamInfoSet.GetAudioOnlyStreams().Where(x => x.IsAudioLanguageDefault.HasValue && x.IsAudioLanguageDefault.Value);
-                    if (defaultLangaugeVideos.Any())
-                    {
-                        bestAudio = defaultLangaugeVideos.GetWithHighestBitrate();
-                    }
-                    else
-                    {
-                        bestAudio = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
-                    }
-                }
-                else
-                {
-                    var videoesInRequestedLanguage = streamInfoSet.GetAudioOnlyStreams().Where(x => x.AudioLanguage.HasValue && x.AudioLanguage.Value.Code.Contains(downloadSettings.VideoLanguage));
-                    if (videoesInRequestedLanguage.Any())
-                    {
-                        bestAudio = videoesInRequestedLanguage.GetWithHighestBitrate();
-                    }
-                    else
-                    {
-                        var defaultAudioStreams = streamInfoSet.GetAudioOnlyStreams().Where(x => x.IsAudioLanguageDefault.HasValue && x.IsAudioLanguageDefault.Value);
-                        if (defaultAudioStreams.Any())
-                        {
-                            bestAudio = defaultAudioStreams.GetWithHighestBitrate();
-                        }
-                        else
-                        {
-                            bestAudio = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
-                        }
-                    }
-                }
+                bestAudio = streamInfoSet.GetAudioOnlyStreams().GetWithHighestBitrate();
 
                 var cleanVideoName = GlobalConsts.CleanFileName(downloadSettings.GetFilenameByPattern(video, i, title, Playlist));
                 var fileLoc = $"{GlobalConsts.TempFolderPath}{cleanVideoName}";
