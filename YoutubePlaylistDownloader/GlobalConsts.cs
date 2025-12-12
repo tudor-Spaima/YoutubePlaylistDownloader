@@ -27,7 +27,8 @@ static class GlobalConsts
     public static Objects.Settings settings;
 
     public static string OppositeTheme => settings.Theme == "Light" ? "Dark" : "Light";
-    public static YoutubeClient YoutubeClient => new();
+    private static readonly YoutubeClient youtubeClient = new();
+    public static YoutubeClient YoutubeClient => youtubeClient;
     public static SemaphoreSlim ConversionsLocker { get => conversionLocker; set => conversionLocker ??= value; }
     public static DownloadSettings DownloadSettings
     {
