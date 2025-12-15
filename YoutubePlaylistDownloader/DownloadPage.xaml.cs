@@ -423,10 +423,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
                                     FileType = new string(copyFileLoc.Skip(copyFileLoc.LastIndexOf('.') + 1).ToArray());
                                     if (afterTagName != outputFileLoc)
                                     {
-                                        if (playlistId.HasValue)
-                                        {
-                                            video = new PlaylistVideo(playlistId.Value, video.Id, afterTagName, video.Author, video.Duration, video.Thumbnails);
-                                        }
+                                        video = UpdateVideoTitle(video, afterTagName, playlistId);
 
                                         cleanFileName = GlobalConsts.CleanFileName(downloadSettings.GetFilenameByPattern(video, videoIndex - 1, title, Playlist));
                                         copyFileLoc = $"{SavePath}\\{cleanFileName}.{FileType}";
@@ -488,10 +485,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
                                 var afterTagName = await GlobalConsts.TagFile(video, i + 1, copyFileLoc, Playlist);
                                 if (afterTagName != outputFileLoc)
                                 {
-                                    if (playlistId.HasValue)
-                                    {
-                                        video = new PlaylistVideo(playlistId.Value, video.Id, afterTagName, video.Author, video.Duration, video.Thumbnails);
-                                    }
+                                    video = UpdateVideoTitle(video, afterTagName, playlistId);
 
                                     cleanFileName = GlobalConsts.CleanFileName(downloadSettings.GetFilenameByPattern(video, i, title, Playlist));
                                     copyFileLoc = $"{SavePath}\\{cleanFileName}.{FileType}";
@@ -928,6 +922,18 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
         }
         GlobalConsts.LoadPage(GlobalConsts.MainPage.Load());
     }
+
+    private static IVideo UpdateVideoTitle(IVideo video, string title, PlaylistId? playlistId)
+    {
+        return video switch
+        {
+            PlaylistVideo playlistVideo when playlistId.HasValue => playlistVideo with { Title = title, PlaylistId = playlistId.Value },
+            PlaylistVideo playlistVideo => playlistVideo with { Title = title },
+            Video fullVideo => fullVideo with { Title = title },
+            _ => video
+        };
+    }
+
     public async void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
         try
